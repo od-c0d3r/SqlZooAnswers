@@ -93,3 +93,14 @@
 7.12) SELECT name FROM actor JOIN casting ON actor.id = actorid AND ord = 1 GROUP BY id,name,actorid HAVING count(actorid)>=15 ORDER BY name
 7.13) SELECT title, COUNT(actorid) FROM movie JOIN casting ON movieid = movie.id WHERE yr = 1978 GROUP BY title ORDER BY COUNT(actorid) DESC, title
 7.14) SELECT name from casting join actor on actorid = actor.id where movieid in (SELECT movieid FROM casting WHERE actorid IN (select id from actor where name = 'Art Garfunkel')) and name <> 'Art Garfunkel'
+
+8.0) SELECT name FROM teacher WHERE dept IS NULL
+8.1) SELECT teacher.name, dept.name FROM teacher INNER JOIN dept ON (teacher.dept=dept.id)
+8.2) SELECT teacher.name, dept.name FROM teacher LEFT JOIN dept ON dept.id = dept
+8.3) SELECT teacher.name, dept.name FROM teacher RIGHT JOIN dept ON dept.id = dept
+8.4) SELECT name, COALESCE(mobile,'07986 444 2266')FROM teacher
+8.5) SELECT teacher.name, COALESCE(dept.name, 'None') FROM teacher LEFT JOIN dept ON dept.id = dept
+8.6) SELECT COUNT(name), COUNT(mobile) FROM teacher
+8.7) SELECT dept.name, COUNT(teacher.name) FROM teacher RIGHT JOIN dept ON dept.id = dept GROUP BY dept.name
+8.8) SELECT name, CASE WHEN dept = 1 OR dept = 2 THEN 'Sci' ELSE 'Art' END newname FROM teacher
+8.9) SELECT name, CASE WHEN dept = 1 OR dept = 2 THEN 'Sci' WHEN dept = 3 THEN 'Art' ELSE 'None' END newname FROM teacher
