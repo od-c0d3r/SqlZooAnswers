@@ -54,6 +54,7 @@
 4.5) SELECT name FROM world WHERE gdp > ALL(SELECT gdp FROM world WHERE gdp > 0 AND continent='Europe')
 4.6) SELECT continent, name, area FROM world x WHERE area >= ALL(SELECT area FROM world y WHERE y.continent = x.continent AND area > 0)
 4.7) SELECT continent, name FROM world x WHERE name <= ALL(SELECT name FROM world y WHERE y.continent = x.continent)
+
 5.0) SELECT SUM(population) FROM world
 5.1) SELECT DISTINCT continent FROM world
 5.2) SELECT SUM(gdp) FROM world WHERE continent = 'Africa'
@@ -73,6 +74,22 @@
 6.7) SELECT DISTINCT player FROM goal JOIN game ON id = matchid WHERE (team1 = 'GER' OR team2 ='GER') AND (teamid <> 'GER')
 6.8) SELECT teamname, COUNT(teamid) AS Goals FROM goal JOIN eteam ON teamid = id GROUP BY teamname
 6.9) SELECT stadium, COUNT(stadium) FROM game JOIN goal ON id = matchid GROUP BY stadium
-9.10) SELECT id, mdate, COUNT(gtime) FROM game JOIN goal ON id = matchid WHERE (team1 = 'POL' OR team2='POL') GROUP BY id, mdate
+6.10) SELECT id, mdate, COUNT(gtime) FROM game JOIN goal ON id = matchid WHERE (team1 = 'POL' OR team2='POL') GROUP BY id, mdate
 6.11) SELECT id, mdate, COUNT(*) FROM game JOIN goal ON id = matchid WHERE teamid = 'GER' GROUP BY id, mdate
 6.12) SELECT mdate,team1,SUM(CASE WHEN teamid=team1 THEN 1 ELSE 0 END) score1, team2, SUM(CASE WHEN teamid=team2 THEN 1 ELSE 0 END) score2 FROM game LEFT JOIN goal ON matchid = id GROUP BY mdate,id,team1,team2
+
+7.0) SELECT id, title FROM movie WHERE yr=1962
+7.1) SELECT yr FROM movie WHERE title='Citizen Kane'
+7.2) SELECT id, title, yr FROM movie WHERE title LIKE 'Star Trek%' ORDER BY yr
+7.3) SELECT id FROM actor where name = 'Glenn Close'
+7.4) select id from movie where title like 'casablanca'
+7.5) select name from actor join casting on id = actorid where movieid= 11768
+7.6) select name from actor join casting on id = actorid where movieid= (select id from movie where title='Alien')
+7.7) select title from actor join casting on id = actorid join movie on movieid = movie.id where name = 'Harrison Ford'
+7.8) select title from actor join casting on id = actorid join movie on movieid = movie.id where name = 'Harrison Ford' and ord <> 1
+7.9) select title, name from actor join casting on id = actorid join movie on movieid = movie.id where ord = 1 and yr = 1962
+7.10) SELECT yr, count(title) FROM movie JOIN casting ON movie.id=movieid JOIN actor   ON actorid=actor.idWHERE name =  'Rock Hudson'GROUP BY yr HAVING count(title) >2
+7.11) SELECT title, name FROM movie JOIN casting ON (movie.id = movieid) JOIN actor ON (actorid = actor.id) WHERE movie.id IN (SELECT movieid FROM casting WHERE actorid IN ( SELECT id FROM actor WHERE name='Julie Andrews')) AND ord = 1
+7.12) SELECT name FROM actor JOIN casting ON actor.id = actorid AND ord = 1 GROUP BY id,name,actorid HAVING count(actorid)>=15 ORDER BY name
+7.13) SELECT title, COUNT(actorid) FROM movie JOIN casting ON movieid = movie.id WHERE yr = 1978 GROUP BY title ORDER BY COUNT(actorid) DESC, title
+7.14) SELECT name from casting join actor on actorid = actor.id where movieid in (SELECT movieid FROM casting WHERE actorid IN (select id from actor where name = 'Art Garfunkel')) and name <> 'Art Garfunkel'
