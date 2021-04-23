@@ -104,3 +104,38 @@
 8.7) SELECT dept.name, COUNT(teacher.name) FROM teacher RIGHT JOIN dept ON dept.id = dept GROUP BY dept.name
 8.8) SELECT name, CASE WHEN dept = 1 OR dept = 2 THEN 'Sci' ELSE 'Art' END newname FROM teacher
 8.9) SELECT name, CASE WHEN dept = 1 OR dept = 2 THEN 'Sci' WHEN dept = 3 THEN 'Art' ELSE 'None' END newname FROM teacher
+
++8.0) SELECT A_STRONGLY_AGREE FROM nss WHERE question='Q01' AND institution='Edinburgh Napier University' AND subject='(8) Computer Science'
++8.1) SELECT institution,subject FROM nss WHERE question='Q15' and score >=100
++8.2) SELECT institution,score FROM nss WHERE question='Q15' AND score < 50 AND subject='(8) Computer Science'
++8.3) SELECT subject, SUM(response) FROM nss WHERE question='Q22' AND subject IN ('(8) Computer Science','(H) Creative Arts and Design') GROUP BY subject
++8.4) SELECT subject , SUM(A_STRONGLY_AGREE*response/100) FROM nss WHERE question='Q22' AND subject IN ('(8) Computer Science','(H) Creative Arts and Design') GROUP BY subject 
++8.5) SELECT  subject,ROUND(SUM((A_STRONGLY_AGREE * response)) / SUM(response),0) FROM nss WHERE question='Q22' AND subject IN ('(8) Computer Science','(H) Creative Arts and Design') GROUP BY subject
++8.6) SELECT institution, ROUND(SUM(score*response) / SUM(response),0) FROM nss WHERE question='Q22' AND (institution LIKE '%Manchester%') GROUP BY institution ORDER BY institution
++8.7) SELECT institution, sum(sample), sum(case when subject ='(8) Computer Science' then sample else 0 end) comp from nss where institution like '%Manchester%' AND question = 'Q01' Group by institution;
+
+-9.0) SELECT lastName, party, votes FROM ge WHERE constituency = 'S14000024' AND yr = 2017 order by votes desc
+-9.1) SELECT party, votes, RANK() OVER (ORDER BY votes DESC) as posn FROM ge WHERE constituency = 'S14000024' AND yr = 2017 ORDER BY party
+-9.2) SELECT yr,party, votes, RANK() OVER (PARTITION BY yr ORDER BY votes DESC) as posn FROM ge WHERE constituency = 'S14000021' ORDER BY party,yr
+-9.3) SELECT constituency, party, votes, RANK() OVER (PARTITION BY constituency ORDER BY votes DESC) as posn FROM ge WHERE constituency BETWEEN 'S14000021' AND 'S14000026' AND yr  = 2017 ORDER BY posn, constituency 
+-9.4) SELECT constituency,party FROM (SELECT constituency, party, RANK() over (partition by constituency order by votes desc) as r FROM ge WHERE constituency BETWEEN 'S14000021' AND 'S14000026' yr  = 2017 ORDER BY r , constituency) x WHERE x.r = 1
+-9.5) select party,count(1) from (select constituency,party from (SELECT constituency,party, votes, RANK() over (partition by constituency order by votes desc) as r FROM ge WHERE constituency like 'S%' AND yr  = 2017 ORDER BY r , constituency) x where x.r=1) y group by party
+
++9.0) SELECT name, DAY(whn), confirmed, deaths, recovered FROM covid WHERE name = 'Spain' AND MONTH(whn) = 3 ORDER BY whn
++9.1) SELECT name, DAY(whn), confirmed, LAG(confirmed,1) OVER (PARTITION BY name ORDER BY whn) FROM covid WHERE name = 'Italy' AND MONTH(whn) = 3 ORDER BY whn
++9.2) SELECT name, DAY(whn), confirmed - LAG(confirmed, 1) OVER (PARTITION BY name ORDER BY whn) FROM covid WHERE name = 'Italy' AND MONTH(whn) = 3 ORDER BY whn
++9.3) SELECT name, DATE_FORMAT(whn,'%Y-%m-%d'), confirmed - LAG(confirmed,1) over (PARTITION BY name ORDER BY whn) FROM covid WHERE name = 'Italy' AND WEEKDAY(whn) = 0 ORDER BY whn
++9.4) SELECT tw.name, DATE_FORMAT(tw.whn,'%Y-%m-%d'), tw.confirmed - lw.confirmed FROM covid tw LEFT JOIN covid lw ON DATE_ADD(lw.whn, INTERVAL 1 WEEK) = tw.whn AND tw.name=lw.name WHERE tw.name = 'Italy' AND WEEKDAY(tw.whn) = 0 ORDER BY tw.whn
++9.5) SELECT name, confirmed, RANK() OVER (ORDER BY confirmed DESC) rc, deaths, RANK() OVER (ORDER BY deaths DESC) rd FROM covid WHERE whn = '2020-04-20' ORDER BY confirmed DESC
++9.6) SELECT  world.name, ROUND(100000*confirmed/population,0), RANK() OVER(ORDER BY confirmed/population) FROM covid JOIN world ON covid.name=world.name WHERE whn = '2020-04-20' AND population > 10000000 ORDER BY population DESC
+
+9.0) SELECT COUNT(*) FROM stops
+9.1) SELECT id FROM stops WHERE name = 'Craiglockhart'
+9.2) SELECT id, name FROM stops JOIN route ON route.stop = stops.id WHERE num = '4' AND company = 'LRT'
+9.3) SELECT company, num, COUNT(*) FROM route WHERE stop=149 OR stop=53 GROUP BY company, num HAVING COUNT(*) = 2
+9.4) SELECT a.company, a.num, a.stop, b.stop FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num) WHERE a.stop=53 and b.stop= (SELECT id from stops where name ='London Road')
+9.5) SELECT a.company, a.num, stopa.name, stopb.name FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num) JOIN stops stopa ON (a.stop=stopa.id) JOIN stops stopb ON (b.stop=stopb.id) WHERE stopa.name='Craiglockhart' and stopb.name = 'London Road'
+9.6) SELECT DISTINCT a.company, a.num FROM route a JOIN route b ON (a.company = b.company AND a.num=b.num) WHERE a.stop = 115 AND b.stop = 137
+9.7) SELECT DISTINCT a.company, a.num FROM route a JOIN route b ON (a.company = b.company AND a.num=b.num) WHERE a.stop = (SELECT id from stops where name ='Craiglockhart') AND b.stop = (SELECT id from stops where name ='Tollcross')
+9.8) SELECT stops.name, a.company, a.num FROM route a JOIN route b ON (a.company = b.company AND a.num=b.num) JOIN stops ON stops.id = b.stop WHERE a.stop = (SELECT id from stops where name ='Craiglockhart')
+9.9) SELECT r1.num, r2.company, s1.name, r4.num, r4.company from route r1 JOIN route r2 ON r1.num=r2.num AND r1.company = r2.company JOIN stops s1 ON r2.stop=s1.id JOIN route r3 ON s1.id=r3.stop JOIN route r4 ON r3.num=r4.num AND r3.company = r4.company WHERE r1.stop= (select id from stops where name='Craiglockhart') AND r4.stop = (select id from stops where name='Lochend') ORDER BY r1.num, s1.name, r4.num
